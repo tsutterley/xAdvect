@@ -108,6 +108,7 @@ Project Details
     :caption: API Reference
 
     api_reference/advect.rst
+    api_reference/datasets/datasets.rst
     api_reference/interpolate.rst
     api_reference/io/io.rst
     api_reference/spatial.rst

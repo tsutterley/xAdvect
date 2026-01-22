@@ -83,7 +83,7 @@ A zip archive of the latest version is available directly at:
 
 ## Alternative Software
 
-Advection tools built upon [`pointCollection`](https://github.com/SmithB/pointCollection)
+Advection tools built upon [`pointCollection`](https://github.com/SmithB/pointCollection):  
 <https://github.com/tsutterley/pointAdvection>
 
 

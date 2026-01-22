@@ -1,0 +1,179 @@
+{
+    "NSIDC-0478": {
+        "collection_concept_id": "C3291179132-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "mapping": {
+            "U": "greenland_vel_mosaic(.*?)_(\\d+)_(\\d+)_vx_v(.*?).tif$",
+            "V": "greenland_vel_mosaic(.*?)_(\\d+)_(\\d+)_vy_v(.*?).tif$",
+            "eU": "greenland_vel_mosaic(.*?)_(\\d+)_(\\d+)_ex_v(.*?).tif$",
+            "eV": "greenland_vel_mosaic(.*?)_(\\d+)_(\\d+)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "greenland_vel_mosaic???_????_????*"
+        ],
+        "source": "https://doi.org/10.5067/OC7B04ZM9G6Q",
+        "title": "MEaSUREs Greenland Ice Sheet Velocity Map from InSAR Data",
+        "version": 2
+    },
+    "NSIDC-0484": {
+        "collection_concept_id": "C3291177469-NSIDC_CPRD",
+        "crs": "EPSG:3031",
+        "format": "netCDF4",
+        "longterm": true,
+        "mapping": {
+            "U": "VX",
+            "V": "VY",
+            "eU": "ERRX",
+            "eV": "ERRY"
+        },
+        "provider": "NSIDC_CPRD",
+        "source": "https://doi.org/10.5067/D7GK8F5J8M8R",
+        "title": "MEaSUREs InSAR-Based Antarctica Ice Velocity Map",
+        "version": 2
+    },
+    "NSIDC-0670": {
+        "collection_concept_id": "C3291956575-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "longterm": true,
+        "mapping": {
+            "U": "greenland_vel_mosaic(.*?)_vx_v(.*?).tif$",
+            "V": "greenland_vel_mosaic(.*?)_vy_v(.*?).tif$",
+            "eU": "greenland_vel_mosaic(.*?)_ex_v(.*?).tif$",
+            "eV": "greenland_vel_mosaic(.*?)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "greenland_vel_mosaic???*"
+        ],
+        "source": "https://doi.org/10.5067/QUA5Q9SVMSJG",
+        "title": "MEaSUREs Multi-year Greenland Ice Sheet Velocity Mosaic",
+        "version": 1
+    },
+    "NSIDC-0720": {
+        "collection_concept_id": "C3298025582-NSIDC_CPRD",
+        "crs": "EPSG:3031",
+        "format": "netCDF4",
+        "mapping": {
+            "U": "VX",
+            "V": "VY",
+            "eU": "ERRX",
+            "eV": "ERRY"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "Antarctica_ice_velocity_????_????_??m_v*"
+        ],
+        "source": "https://doi.org/10.5067/9T4EPQXTJYW9",
+        "title": "MEaSUREs Annual Antarctic Ice Velocity Maps",
+        "version": 1
+    },
+    "NSIDC-0725": {
+        "collection_concept_id": "C3298042936-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "mapping": {
+            "U": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vx_v(.*?).tif$",
+            "V": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vy_v(.*?).tif$",
+            "eU": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ex_v(.*?).tif$",
+            "eV": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "GL_vel_mosaic_??????_???????_???????_velocity*"
+        ],
+        "source": "https://doi.org/10.5067/USBL3Z8KF9C3",
+        "title": "MEaSUREs Greenland Annual Ice Sheet Velocity Mosaics from SAR and Landsat",
+        "version": 5
+    },
+    "NSIDC-0727": {
+        "collection_concept_id": "C3297893512-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "mapping": {
+            "U": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vx_v(.*?).tif$",
+            "V": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vy_v(.*?).tif$",
+            "eU": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ex_v(.*?).tif$",
+            "eV": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "GL_vel_mosaic_?????????_???????_???????_velocity*"
+        ],
+        "source": "https://doi.org/10.5067/V5KW64S63OSN",
+        "title": "MEaSUREs Greenland Quarterly Ice Sheet Velocity Mosaics from SAR and Landsat",
+        "version": 5
+    },
+    "NSIDC-0731": {
+        "collection_concept_id": "C3297904665-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "mapping": {
+            "U": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vx_v(.*?).tif$",
+            "V": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vy_v(.*?).tif$",
+            "eU": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ex_v(.*?).tif$",
+            "eV": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "GL_vel_mosaic_???????_???????_???????_velocity*"
+        ],
+        "source": "https://doi.org/10.5067/EGKZX6FXXM4P",
+        "title": "MEaSUREs Greenland Monthly Ice Sheet Velocity Mosaics from SAR and Landsat",
+        "version": 5
+    },
+    "NSIDC-0754": {
+        "collection_concept_id": "C3298047930-NSIDC_CPRD",
+        "crs": "EPSG:3031",
+        "format": "netCDF4",
+        "longterm": true,
+        "mapping": {
+            "U": "VX",
+            "V": "VY",
+            "eU": "ERRX",
+            "eV": "ERRY"
+        },
+        "provider": "NSIDC_CPRD",
+        "source": "https://doi.org/10.5067/PZ3NJ5RXRH10",
+        "title": "MEaSUREs Phase-Based Antarctica Ice Velocity Map",
+        "version": 1
+    },
+    "NSIDC-0761": {
+        "collection_concept_id": "C3298060693-NSIDC_CPRD",
+        "crs": "EPSG:3031",
+        "format": "netCDF4",
+        "mapping": {
+            "U": "VX",
+            "V": "VY",
+            "eU": "ERRX",
+            "eV": "ERRY"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "antarctica_ice_velocity_????-????_???m_v*"
+        ],
+        "source": "https://doi.org/10.5067/FB851ZIZYX5O",
+        "title": "MEaSUREs Multi-year Reference Velocity Maps of the Antarctic Ice Sheet",
+        "version": 1
+    },
+    "NSIDC-0766": {
+        "collection_concept_id": "C3298524394-NSIDC_CPRD",
+        "crs": "EPSG:3413",
+        "format": "geotiff",
+        "mapping": {
+            "U": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vx_v(.*?).tif$",
+            "V": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_vy_v(.*?).tif$",
+            "eU": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ex_v(.*?).tif$",
+            "eV": "GL_vel_mosaic_(.*?)_(\\w+)_(\\w+)_ey_v(.*?).tif$"
+        },
+        "provider": "NSIDC_CPRD",
+        "readable_granule_name": [
+            "GL_vel_mosaic_???????_???????_???????_velocity*"
+        ],
+        "source": "https://doi.org/10.5067/1AMEDB6VJ1NZ",
+        "title": "MEaSUREs Greenland 6 and 12 day Ice Sheet Velocity Mosaics from SAR",
+        "version": 2
+    }
+}

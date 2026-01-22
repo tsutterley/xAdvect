@@ -2,7 +2,7 @@
 """
 utilities.py
 Written by Tyler Sutterley (01/2026)
-Download and management utilities for syncing time and auxiliary files
+Download and management utilities for syncing files
 
 PYTHON DEPENDENCIES:
     lxml: processing XML and HTML in Python
@@ -23,8 +23,8 @@ import io
 import ssl
 import json
 import shutil
-import inspect
 import hashlib
+import inspect
 import logging
 import pathlib
 import warnings
