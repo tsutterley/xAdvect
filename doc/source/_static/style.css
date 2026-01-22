@@ -1,0 +1,45 @@
+/* color adjustments to fit logo theme */
+.wy-menu > .caption > span.caption-text {
+    color: #4786bb;
+}
+.wy-nav-top {
+    background-color: #4786bb;
+    color: #ffffff;
+}
+.wy-side-nav-search {
+    background-color: #4786bb;
+}
+.wy-side-nav-search input[type="text"] {
+    border-color: #3e69b0;
+}
+
+/* fix for position of equation numbers
+ * https://github.com/rtfd/sphinx_rtd_theme/issues/301
+ */
+.eqno {
+    margin-left: 5px;
+    float: right;
+}
+.math .headerlink {
+    display: none;
+    visibility: hidden;
+}
+.math:hover .headerlink {
+    display: inline-block;
+    visibility: visible;
+    margin-right: -0.7em;
+}
+
+/* fix for property line spacing
+* https://github.com/rtfd/sphinx_rtd_theme/issues/1301
+*/
+.property {
+    display: block !important;
+    padding-right: 8px;
+    max-width: 100%;
+}
+
+/* caption positions for tables and figures */
+.docutils caption {
+    caption-side: bottom;
+}

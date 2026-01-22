@@ -1,0 +1,201 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xAdvect"
+version = "0.0.1"
+description = "Utilities for advecting point data for use in a Lagrangian reference frame"
+keywords = [
+    "ICESat-2",
+    "surface elevation and change",
+    "advection",
+    "mass transport",
+    "Lagrangian reference frame",
+]
+authors = [
+    {name = "Tyler Sutterley"},
+    {email = "tsutterl@uw.edu"}
+]
+maintainers = [
+    {name = "xAdvect contributors"}
+]
+license = {file = "LICENSE"}
+readme = {file = "README.md", content-type = "text/markdown"}
+
+requires-python = "~=3.9"
+dependencies = [
+    "h5netcdf",
+    "lxml",
+    "numpy",
+    "platformdirs",
+    "pyproj",
+    "scipy>=1.10.1",
+    "timescale>=0.0.8",
+    "xarray"
+]
+
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Repository = "https://github.com/tsutterley/xAdvect"
+Issues = "https://github.com/tsutterley/xAdvect/issues"
+
+[project.optional-dependencies]
+doc = ["docutils", "graphviz", "ipympl", "myst-nb", "numpydoc", "sphinx", "sphinx-argparse>=0.4", "sphinxcontrib-bibtex", "sphinx-design", "sphinx_rtd_theme"]
+all = ["cartopy", "dask", "geopandas", "jupyterlab", "matplotlib", "notebook", "rioxarray"]
+dev = ["flake8", "pytest>=4.6", "pytest-cov", "pytest-xdist"]
+
+[project.scripts]
+
+[tool.setuptools.packages.find]
+exclude = ["test*"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+norecursedirs = ".git"
+addopts = "-n auto --verbose --capture=no -W ignore::UserWarning"
+python_files = [
+    "test*.py"
+]
+testpaths = [
+    "test"
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+    "xAdvect",
+]
+omit = [
+    "doc/*",
+    "xAdvect/datasets/*",
+    "test/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+
+[tool.ruff]
+line-length = 80
+indent-width = 4
+exclude = [
+    ".git",
+    ".pixi",
+    "build",
+    "doc",
+    "run",
+    "test",
+]
+
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # ruff-specific
+    "RUF",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = false
+
+[tool.pixi.workspace]
+name = "xAdvect"
+authors = ["xAdvect contributors"]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64", "win-64"]
+
+[tool.pixi.pypi-dependencies]
+xAdvect = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+all = { features = ["all"], solve-group = "default" }
+dev = { features = ["all", "dev", "doc"], solve-group = "default" }
+doc = { features = ["all", "doc"], solve-group = "default" }
+
+[tool.pixi.tasks.start]
+cmd = "jupyter lab"
+cwd = "doc/source/notebooks"
+description = "Start JupyterLab in the notebooks directory"
+
+[tool.pixi.tasks.export-env]
+args = [ { "arg" = "flags", "default" = "" } ]
+cmd = "pixi workspace export conda-environment {{ flags }} > environment.yml"
+description = "Export workspace to a conda environment file" 
+
+[tool.pixi.feature.doc.tasks.docs]
+args = [ { "arg" = "flags", "default" = "" } ]
+cmd = "make html {{ flags }}"
+cwd = "doc"
+description = "Create HTML documentation with sphinx"
+
+[tool.pixi.feature.dev.tasks.lint]
+args = [ { "arg" = "flags", "default" = "--select=E9,F63,F7,F82 --show-source" }, { "arg" = "test", "default" = "." } ]
+cmd = "flake8 {{ test }} --count {{ flags }} --statistics --extend-exclude 'build/,run/,*.ipynb_checkpoints/,.pixi/'"
+description = "Run flake8 to check for compilation errors"
+
+[tool.pixi.dependencies]
+h5netcdf = "*"
+lxml = "*"
+numpy = "*"
+pint = "*"
+platformdirs = "*"
+pyproj = ">=2.5.0"
+scipy = ">=1.10.1"
+timescale = ">=0.0.8"
+xarray = "*"
+
+[tool.pixi.feature.all.dependencies]
+cartopy = "*"
+dask = "*"
+geopandas = "*"
+jupyterlab = "*"
+matplotlib-base = "*"
+notebook = "*"
+rioxarray = "*"
+
+[tool.pixi.feature.dev.dependencies]
+flake8 = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+
+[tool.pixi.feature.doc.dependencies]
+docutils = "*"
+graphviz = "*"
+ipympl = "*"
+myst-nb = "*"
+numpydoc = "*"
+sphinx = "*"
+sphinx-argparse = "*"
+sphinxcontrib-bibtex = "*"
+sphinx-design = "*"
+sphinx_rtd_theme = "*"
