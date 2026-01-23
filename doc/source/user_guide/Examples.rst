@@ -17,5 +17,6 @@ Examples
 
     .. grid-item-card::  Plot Velocities
       :text-align: center
+      :img-top: ../_assets/plot_velocities.png
       :link: ../notebooks/Plot-Velocities.html
       :link-alt: Plot ice velocities over the Antarctic Peninsula

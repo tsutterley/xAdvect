@@ -9,13 +9,14 @@ Lagrangian reference frame powered by xarray
 
 Documentation is available at https://xAdvect.readthedocs.io
 """
+
 # base modules
 import xAdvect.interpolate
 import xAdvect.spatial
 import xAdvect.tools
 import xAdvect.utilities
 from xAdvect.advect import Advect
-from xAdvect import io
+from xAdvect import io, datasets
 
 import xAdvect.version
 

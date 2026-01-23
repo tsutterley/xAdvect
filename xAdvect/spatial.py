@@ -59,10 +59,10 @@ def data_type(x: np.ndarray, y: np.ndarray, t: np.ndarray) -> str:
     else:
         raise ValueError("Unknown data type")
 
-    
+
 def scale_factors(
     lat: np.ndarray,
-    flat: float = 1.0/298.257223563,
+    flat: float = 1.0 / 298.257223563,
     reference_latitude: float = 70.0,
     metric: str = "area",
 ):
