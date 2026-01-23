@@ -17,6 +17,7 @@ PYTHON DEPENDENCIES:
 UPDATE HISTORY:
     Written 01/2026
 """
+
 from __future__ import division, annotations
 
 import os
@@ -35,10 +36,9 @@ os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 # suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
+
 # PURPOSE: read a list of files
-def open_mfdataset(
-    filename: list[str] | list[pathlib.Path], **kwargs
-):
+def open_mfdataset(filename: list[str] | list[pathlib.Path], **kwargs):
     """
     Open multiple netCDF4 files
 
@@ -68,6 +68,7 @@ def open_mfdataset(
     ds = xr.merge(d, compat="override")
     # return xarray dataset
     return ds
+
 
 def open_dataset(
     filename: str,
@@ -106,7 +107,7 @@ def open_dataset(
     else:
         ds = tmp.copy()
     # attach coordinate reference system (CRS) information
-    if crs is not None: 
+    if crs is not None:
         ds.attrs["crs"] = pyproj.CRS.from_user_input(crs).to_dict()
     # return the xarray dataset
     return ds

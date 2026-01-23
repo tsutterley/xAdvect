@@ -11,6 +11,7 @@ from .geotiff import *
 # set environmental variable for anonymous s3 access
 os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 
+
 def open_dataset(
     filename: str,
     mapping: dict | None = None,
@@ -42,8 +43,18 @@ def open_dataset(
     ds: xr.Dataset
         xarray Dataset
     """
-    nc = (".nc", ".nc4", ".h5", ".hdf5", )
-    tiff = (".tif", ".tiff", ".geotiff", ".cog", )
+    nc = (
+        ".nc",
+        ".nc4",
+        ".h5",
+        ".hdf5",
+    )
+    tiff = (
+        ".tif",
+        ".tiff",
+        ".geotiff",
+        ".cog",
+    )
     if format == "netCDF4" and isinstance(filename, list):
         return netcdf.open_mfdataset(
             filename=filename,

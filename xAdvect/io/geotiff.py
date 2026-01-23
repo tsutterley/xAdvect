@@ -15,6 +15,7 @@ PYTHON DEPENDENCIES:
 UPDATE HISTORY:
     Written 01/2026
 """
+
 from __future__ import division, annotations
 
 import os
@@ -37,6 +38,7 @@ rioxarray.merge = xAdvect.utilities.import_dependency("rioxarray.merge")
 os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 # suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
+
 
 def open_mfdataset(
     filename: list,
@@ -64,7 +66,7 @@ def open_mfdataset(
     for f in filename:
         # determine variable name from mapping
         try:
-            k, = [k for k, v in mapping.items() if re.search(v, str(f), re.I)]
+            (k,) = [k for k, v in mapping.items() if re.search(v, str(f), re.I)]
         except ValueError:
             continue
         # determine pattern for extracting time information
@@ -73,8 +75,8 @@ def open_mfdataset(
         datasets.append(
             open_dataset(
                 f,
-                variable = k,
-                pattern = pattern,
+                variable=k,
+                pattern=pattern,
                 **kwargs,
             )
         )
@@ -82,6 +84,7 @@ def open_mfdataset(
     darr = xr.merge(datasets, compat="override")
     # return xarray Dataset
     return darr
+
 
 def open_dataset(
     filename: list,
@@ -114,10 +117,9 @@ def open_dataset(
     # return the xarray Dataset
     return ds
 
+
 # PURPOSE: read a list of model files
-def open_mfdataarray(
-    filename: list[str] | list[pathlib.Path], **kwargs
-):
+def open_mfdataarray(filename: list[str] | list[pathlib.Path], **kwargs):
     """
     Open multiple geotiff files
 
@@ -148,6 +150,7 @@ def open_mfdataarray(
     darr = xr.merge(d, compat="override")
     # return xarray DataArray
     return darr
+
 
 def open_dataarray(
     filename: str,
@@ -180,10 +183,7 @@ def open_dataarray(
     name = xAdvect.utilities.Path(filename).name
     # open the geotiff file using rioxarray
     darr = rioxarray.open_rasterio(
-        filename,
-        masked=True,
-        chunks=chunks,
-        **kwargs
+        filename, masked=True, chunks=chunks, **kwargs
     )
     # assign time dimension for long-term averages or from filename pattern
     if longterm:
@@ -195,7 +195,7 @@ def open_dataarray(
         # parse strings into datetime objects
         start_time = timescale.time.parse(start)
         end_time = timescale.time.parse(end)
-        time_array = np.array([start_time, end_time], dtype='datetime64[D]')
+        time_array = np.array([start_time, end_time], dtype="datetime64[D]")
         # convert to timescale objects and take the mean
         ts = timescale.from_datetime(time_array)
         darr["time"] = xr.DataArray(ts.mean().to_datetime(), dims="band")
@@ -203,7 +203,7 @@ def open_dataarray(
     else:
         raise ValueError(f"Cannot extract time information from: {name}")
     # attach coordinate reference system (CRS) information
-    if crs is not None: 
+    if crs is not None:
         darr.attrs["crs"] = pyproj.CRS.from_user_input(crs).to_dict()
     else:
         crs_wkt = darr.spatial_ref.attrs["crs_wkt"]
