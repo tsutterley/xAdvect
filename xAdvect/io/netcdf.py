@@ -24,8 +24,10 @@ import os
 import pyproj
 import pathlib
 import warnings
+import numpy as np
 import xarray as xr
 import xAdvect.utilities
+import timescale.time
 
 # attempt imports
 dask = xAdvect.utilities.import_dependency("dask")
@@ -92,10 +94,13 @@ def open_dataset(
     ds: xr.Dataset
         xarray Dataset
     """
+    # set default keyword arguments
+    kwargs.setdefault("longterm", False)
     # get coordinate reference system (CRS) information from kwargs
     crs = kwargs.get("crs", None)
     # open the NetCDF file using xarray
     tmp = xr.open_dataset(filename, mask_and_scale=True, chunks=chunks)
+    tmp = tmp.drop_vars(["lon", "lat"], errors="ignore")
     # apply variable mapping if provided
     if mapping is not None:
         # create xarray dataset
@@ -106,6 +111,18 @@ def open_dataset(
         ds.attrs = tmp.attrs.copy()
     else:
         ds = tmp.copy()
+    # assign time dimension for long-term averages or from attributes
+    if kwargs["longterm"]:
+        pass
+    elif "time_coverage_start" in ds.attrs and "time_coverage_end" in ds.attrs:
+        ds = ds.expand_dims(dim="time", axis=2)
+        # parse strings into datetime objects
+        start_time = timescale.time.parse(ds.attrs["time_coverage_start"])
+        end_time = timescale.time.parse(ds.attrs["time_coverage_end"])
+        time_array = np.array([start_time, end_time], dtype="datetime64[D]")
+        # convert to timescale objects and take the mean
+        ts = timescale.from_datetime(time_array)
+        ds["time"] = ts.mean().to_datetime()
     # attach coordinate reference system (CRS) information
     if crs is not None:
         ds.attrs["crs"] = pyproj.CRS.from_user_input(crs).to_dict()
