@@ -42,6 +42,7 @@ __all__ = [
     "generate_presigned_url",
     "attempt_login",
     "build_opener",
+    "get_token",
     "list_tokens",
     "revoke_token",
     "check_credentials",
@@ -335,7 +336,6 @@ def attempt_login(
         logging.error(exc)
         # try retrieving credentials from environmental variables
         username, password = (kwargs["username"], kwargs["password"])
-        pass
     # if username or password are not available
     if not username:
         username = builtins.input(f"Username for {urs}: ")
@@ -359,7 +359,6 @@ def attempt_login(
             check_credentials()
         except Exception as exc:
             logging.error(exc)
-            pass
         else:
             return opener
         # reattempt login
@@ -612,7 +611,7 @@ def check_credentials():
     try:
         remote_path = "https://urs.earthdata.nasa.gov/api/users/tokens"
         request = urllib2.Request(url=remote_path)
-        response = urllib2.urlopen(request, timeout=20)
+        urllib2.urlopen(request, timeout=20)
     except urllib2.HTTPError as exc:
         raise RuntimeError("Check your NASA Earthdata credentials") from exc
     except urllib2.URLError as exc:

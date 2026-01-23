@@ -3,10 +3,11 @@ Input/output functions for reading velocity data
 """
 
 import os
+import pathlib
 import xarray as xr
-from .dataset import *
-from .netcdf import *
-from .geotiff import *
+from . import dataset
+from . import netcdf
+from . import geotiff
 
 # set environmental variable for anonymous s3 access
 os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
@@ -72,6 +73,7 @@ def open_dataset(
     elif format == "geotiff" and isinstance(filename, list):
         return geotiff.open_mfdataset(
             filename=filename,
+            mapping=mapping,
             chunks=chunks,
             **kwargs,
         )
