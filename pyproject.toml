@@ -157,6 +157,16 @@ cmd = "make html {{ flags }}"
 cwd = "doc"
 description = "Create HTML documentation with sphinx"
 
+[tool.pixi.feature.dev.tasks.test]
+args = [ { "arg" = "flags", "default" = "" }, { "arg" = "test", "default" = "." } ]
+cmd = "pytest {{ flags }} {{ test }}"
+cwd = "test"
+description = "Run the pytest suite"
+
+[tool.pixi.feature.dev.tasks.coverage]
+cmd = "pytest -n=0 --cov=xAdvect --junitxml=pytest.xml --cov-report=xml test"
+description = "Run the pytest suite and create coverage reports"
+
 [tool.pixi.feature.dev.tasks.lint]
 args = [ { "arg" = "flags", "default" = "--select=E9,F63,F7,F82 --show-source" }, { "arg" = "test", "default" = "." } ]
 cmd = "flake8 {{ test }} --count {{ flags }} --statistics --extend-exclude 'build/,run/,*.ipynb_checkpoints/,.pixi/'"
