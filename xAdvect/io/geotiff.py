@@ -202,8 +202,7 @@ def open_dataarray(
     )
     # assign time dimension for long-term averages or from filename pattern
     if longterm:
-        darr["time"] = np.datetime64("1990-01-01")
-        darr = darr.swap_dims({"band": "time"})
+        pass
     elif pattern and re.search(pattern, name, re.I):
         # extract start and end time from filename
         _, start, end, _ = re.findall(pattern, name, re.I).pop()

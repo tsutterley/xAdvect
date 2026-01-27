@@ -14655,7 +14655,7 @@ packages:
 - pypi: ./
   name: xadvect
   version: 0.0.1
-  sha256: e3a016a2d3409c200b35203bea9f8f90e93928e99f8fb1548dd855108b337ba6
+  sha256: 4c6698b8a669130461d57ddb77986723af62792b8f82d2180fb19d8de709e5a2
   requires_dist:
   - h5netcdf
   - lxml

@@ -57,9 +57,14 @@ wheels/
 .installed.cfg
 *.egg
 .pytest_cache
+.coverage
 pythonenv*/
+venv/
+*build-commands.txt
 setup-miniconda-patched-environment.yml
 .vscode
+pytest.xml
+coverage.xml
 # OS generated files #
 ######################
 .DS_Store
@@ -83,6 +88,7 @@ Thumbs.db
 *.ilg
 *.ind
 *.ist
+*.jats
 *.lof
 *.lot
 *.nav
@@ -107,3 +113,6 @@ None*.png
 .ipynb_checkpoints
 Untitled.ipynb
 core.*
+# pixi environments
+.pixi/*
+!.pixi/config.toml

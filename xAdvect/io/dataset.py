@@ -25,6 +25,7 @@ import pyproj
 import warnings
 import numpy as np
 import xarray as xr
+import timescale.time
 
 # suppress warnings
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -33,6 +34,8 @@ __all__ = ["Dataset", "DataArray", "_transform", "_coords"]
 
 # pint unit registry
 __ureg__ = pint.UnitRegistry()
+# default epoch for time conversions
+__epoch__ = timescale.time._j2000_epoch
 
 
 @xr.register_dataset_accessor("advect")
@@ -161,6 +164,34 @@ class Dataset:
         # return the dataset
         return ds
 
+    def run(self, **kwargs):
+        """
+        Advect coordinates using the velocity field in the ``Dataset``
+
+        Parameters
+        ----------
+        kwargs: keyword arguments
+            keyword arguments for ``xAdvect.advect()``
+
+        Returns
+        -------
+        x0: np.ndarray
+            Advected x-coordinates
+        y0: np.ndarray
+            Advected y-coordinates
+        """
+        from xAdvect.advect import Advect
+
+        # convert dataset to base units
+        ds = self.to_base_units()
+        # extract keyword arguments for run function
+        run_keywords = ["integrator", "method", "step", "N"]
+        run_kwargs = {k: kwargs.pop(k) for k in run_keywords if k in kwargs}
+        # run advection model on dataset
+        x0, y0 = Advect(ds, **kwargs).run(**run_kwargs)
+        # return the advected coordinates
+        return x0, y0
+
     def transform_as(
         self,
         x: np.ndarray,
@@ -220,8 +251,15 @@ class Dataset:
         # create copy of dataset
         ds = self._ds.copy()
         # convert velocities to base units
-        ds.U = ds.U.advect.to_base_units()
-        ds.V = ds.V.advect.to_base_units()
+        ds["U"] = ds.U.advect.to_base_units()
+        ds["V"] = ds.V.advect.to_base_units()
+        # convert time coordinate to deltatime in seconds
+        if "time" in ds:
+            ts = timescale.from_datetime(ds["time"])
+            ds["t"] = xr.DataArray(
+                ts.to_deltatime(epoch=__epoch__, scale=86400.0), dims="time"
+            )
+            ds = ds.swap_dims({"time": "t"}).drop_vars("time")
         # return the dataset
         return ds
 

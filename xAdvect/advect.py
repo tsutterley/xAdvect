@@ -21,7 +21,11 @@ import copy
 import logging
 import numpy as np
 import xarray as xr
-import timescale
+import timescale.time
+
+
+# default epoch for time conversions
+__epoch__ = timescale.time._j2000_epoch
 
 
 class Advect:
@@ -70,19 +74,24 @@ class Advect:
         kwargs.setdefault("t0", 0.0)
         kwargs.setdefault("integrator", "RK4")
         kwargs.setdefault("method", "linear")
-        kwargs.setdefault("time_units", "seconds")
+        kwargs.setdefault("time_units", "seconds since 2018-01-01T00:00:00")
+        # parse time units
+        epoch, to_sec = timescale.time.parse_date_string(kwargs["time_units"])
         # set default class attributes
-        time_units = copy.copy(kwargs["time_units"])
-        to_sec = timescale.time._to_sec[time_units]
-        self.x = np.atleast_1d(kwargs["x"]).astype("f8")
-        self.y = np.atleast_1d(kwargs["y"]).astype("f8")
-        self.t = to_sec * np.array(kwargs["t"], dtype="f8")
-        self.x0 = None
-        self.y0 = None
-        self.t0 = to_sec * np.array(kwargs["t0"], dtype="f8")
-        self.velocity = ds.advect.to_base_units()
-        self.integrator = copy.copy(kwargs["integrator"])
-        self.method = copy.copy(kwargs["method"])
+        self.x = copy.deepcopy(kwargs["x"])
+        self.y = copy.deepcopy(kwargs["y"])
+        # convert times to deltatime in seconds since J2000
+        self._time = timescale.from_deltatime(
+            to_sec * np.array(kwargs["t"], dtype="f8"), epoch=epoch
+        )
+        self.t = self._time.to_deltatime(epoch=__epoch__, scale=86400.0)
+        self._time0 = timescale.from_deltatime(
+            to_sec * np.array(kwargs["t0"], dtype="f8"), epoch=epoch
+        )
+        self.t0 = self._time0.to_deltatime(epoch=__epoch__, scale=86400.0)
+        self.velocity = ds
+        self.integrator = copy.deepcopy(kwargs["integrator"])
+        self.method = copy.deepcopy(kwargs["method"])
 
     def run(self, **kwargs):
         """
@@ -100,14 +109,44 @@ class Advect:
         # return final coordinates
         return self.x0, self.y0
 
-    def interp(self, **kwargs):
+    def interp(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        t: float | np.ndarray = 0.0,
+        **kwargs,
+    ):
         """
         Interpolates velocity data to specified coordinates
+
+        Parameters
+        ----------
+        x: np.ndarray
+            x-coordinates
+        y: np.ndarray
+            y-coordinates
+        t: float or np.ndarray, default 0.0
+            time coordinates
+        kwargs: dict
+            keyword arguments for xarray interpolation
         """
-        # create copy of velocity dataset
+        # create xarray Dataset for interpolated velocities
         ds = xr.Dataset()
-        for key, val in self.velocity.data_vars.items():
-            ds[key] = val.interp(**kwargs)
+        # interpolate to specified coordinates
+        if "t" in self.velocity:
+            # clip time to within range of velocity dataset
+            clipped = np.clip(
+                copy.deepcopy(t),
+                np.min(self.velocity.t.values),
+                np.max(self.velocity.t.values),
+            )
+            # interpolate to x, y, and t coordinates
+            for v in ("U", "V"):
+                ds[v] = self.velocity[v].interp(x=x, y=y, t=clipped, **kwargs)
+        else:
+            # interpolate to x and y coordinates
+            for v in ("U", "V"):
+                ds[v] = self.velocity[v].interp(x=x, y=y, **kwargs)
         # return the dataset
         return ds
 
@@ -129,8 +168,8 @@ class Advect:
 
                 - ``'linear'``: linear interpolation for regular grids
                 - ``'nearest'``: nearest-neighbor interpolation
-        step: int or float, default 1
-            Temporal step size for advection
+        step: int or float, default 86400
+            Temporal step size for advection (in seconds)
         N: int or NoneType, default None
             Number of integration steps
 
@@ -141,22 +180,22 @@ class Advect:
         # set default keyword arguments
         kwargs.setdefault("integrator", self.integrator)
         kwargs.setdefault("method", self.method)
-        kwargs.setdefault("step", 1)
+        kwargs.setdefault("step", 86400)
         kwargs.setdefault("N", None)
         kwargs.setdefault("t0", self.t0)
         # update advection class attributes
         if kwargs["integrator"] != self.integrator:
-            self.integrator = copy.copy(kwargs["integrator"])
+            self.integrator = copy.deepcopy(kwargs["integrator"])
         if kwargs["method"] != self.method:
-            self.method = copy.copy(kwargs["method"])
+            self.method = copy.deepcopy(kwargs["method"])
         if kwargs["t0"] != self.t0:
-            self.t0 = np.copy(kwargs["t0"])
+            self.t0 = copy.deepcopy(kwargs["t0"])
         # advect the parcel every step
         # (using closest number of iterations)
         step = np.float64(kwargs["step"])
         # set or calculate the number of steps to advect the dataset
         if kwargs["N"] is not None:
-            n_steps = np.copy(kwargs["N"])
+            n_steps = copy.deepcopy(kwargs["N"])
         elif np.min(self.t0) < np.min(self.t):
             # maximum number of steps to advect backwards in time
             n_steps = np.abs(np.max(self.t) - np.min(self.t0)) / step
@@ -196,14 +235,15 @@ class Advect:
         """
         # set default keyword options
         kwargs.setdefault("N", 1)
-        # translate parcel from time 1 to time 2 at time step
+        # translate parcel from t to t0 at time step
         dt = (self.t0 - self.t) / np.float64(kwargs["N"])
-        self.x0 = np.copy(self.x)
-        self.y0 = np.copy(self.y)
+        self.x0 = copy.deepcopy(self.x)
+        self.y0 = copy.deepcopy(self.y)
         # keep track of time for 3-dimensional interpolations
-        t = np.copy(self.t)
+        t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
             ds = self.interp(x=self.x0, y=self.y0, t=t)
+            # add displacements to x0 and y0
             self.x0 += ds.U.values * dt
             self.y0 += ds.V.values * dt
             # add to time
@@ -223,26 +263,24 @@ class Advect:
         """
         # set default keyword options
         kwargs.setdefault("N", 1)
-        # translate parcel from time 1 to time 2 at time step
-        dt = (self.t0 - self.t) / np.float64(kwargs["N"])
-        self.x0 = np.copy(self.x)
-        self.y0 = np.copy(self.y)
+        # translate parcel from t to t0 at time step
+        dt = np.squeeze(self.t0 - self.t) / np.float64(kwargs["N"])
+        self.x0 = copy.deepcopy(self.x)
+        self.y0 = copy.deepcopy(self.y)
         # keep track of time for 3-dimensional interpolations
-        t = np.copy(self.t)
+        t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
             ds1 = self.interp(x=self.x0, y=self.y0, t=t)
-            x2, y2 = (
-                self.x0 + 0.5 * ds1.U.values * dt,
-                self.y0 + 0.5 * ds1.V.values * dt,
-            )
+            x2 = self.x0 + 0.5 * ds1.U.values * dt
+            y2 = self.y0 + 0.5 * ds1.V.values * dt
             ds2 = self.interp(x=x2, y=y2, t=t)
-            x3, y3 = (
-                self.x0 + 0.5 * ds2.U.values * dt,
-                self.y0 + 0.5 * ds2.V.values * dt,
-            )
+            x3 = self.x0 + 0.5 * ds2.U.values * dt
+            y3 = self.y0 + 0.5 * ds2.V.values * dt
             ds3 = self.interp(x=x3, y=y3, t=t)
-            x4, y4 = (self.x0 + ds3.U.values * dt, self.y0 + ds3.V.values * dt)
+            x4 = self.x0 + ds3.U.values * dt
+            y4 = self.y0 + ds3.V.values * dt
             ds4 = self.interp(x=x4, y=y4, t=t)
+            # add displacements to x0 and y0
             self.x0 += (
                 dt
                 * (
@@ -305,41 +343,40 @@ class Advect:
         tolerance = 5e-2
         # multiply scale by factors of 2 until iteration reaches tolerance level
         scale = 1
-        self.x0 = np.copy(self.x)
-        self.y0 = np.copy(self.y)
+        self.x0 = copy.deepcopy(self.x)
+        self.y0 = copy.deepcopy(self.y)
         # while the difference (sigma) is greater than the tolerance
         while (sigma > tolerance) or np.isnan(sigma):
-            # translate parcel from time 1 to time 2 at time step
+            # translate parcel from t to t0 at time step
             dt = (self.t0 - self.t) / np.float64(scale * kwargs["N"])
-            X4OA = np.copy(self.x)
-            Y4OA = np.copy(self.y)
-            X5OA = np.copy(self.x)
-            Y5OA = np.copy(self.y)
+            X4OA = copy.deepcopy(self.x)
+            Y4OA = copy.deepcopy(self.y)
+            X5OA = copy.deepcopy(self.x)
+            Y5OA = copy.deepcopy(self.y)
             # keep track of time for 3-dimensional interpolations
-            t = np.copy(self.t)
+            t = copy.deepcopy(self.t)
             for i in range(scale * kwargs["N"]):
                 # calculate fourth order accurate solutions
                 u4, v4 = self.RFK45_interp(X4OA, Y4OA, dt, t=t)
+                # add displacements to X40A and Y40A
                 X4OA += dt * np.dot(b4, u4)
                 Y4OA += dt * np.dot(b4, v4)
                 # calculate fifth order accurate solutions
                 u5, v5 = self.RFK45_interp(X5OA, Y5OA, dt, t=t)
+                # add displacements to X50A and Y50A
                 X5OA += dt * np.dot(b5, u5)
                 Y5OA += dt * np.dot(b5, v5)
                 # add to time
                 t += dt
             # calculate difference between 4th and 5th order accurate solutions
-            (i,) = np.nonzero(np.isfinite(X4OA) & np.isfinite(Y4OA))
-            num = np.count_nonzero(np.isfinite(X4OA) & np.isfinite(Y4OA))
-            sigma = np.sqrt(
-                np.sum((X5OA[i] - X4OA[i]) ** 2 + (Y5OA[i] - Y4OA[i]) ** 2)
-                / num
-            )
-            # if sigma is less than the tolerance: save xi and yi coordinates
+            variance = (X5OA - X4OA) ** 2 + (Y5OA - Y4OA) ** 2
+            sigma = np.sqrt(np.nanmean(variance))
+            logging.debug(f"RKF45 sigma: {sigma:.4f} (tolerance: {tolerance})")
+            # if sigma is less than the tolerance: save x and y coordinates
             # else: multiply scale by factors of 2 and re-run iteration
             if (sigma <= tolerance) or np.isnan(sigma):
-                self.x0 = np.copy(X4OA)
-                self.y0 = np.copy(Y4OA)
+                self.x0 = copy.deepcopy(X4OA)
+                self.y0 = copy.deepcopy(Y4OA)
             else:
                 scale *= 2
         # return the translated coordinates
