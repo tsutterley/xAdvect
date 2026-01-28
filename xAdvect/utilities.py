@@ -11,6 +11,7 @@ PYTHON DEPENDENCIES:
         https://pypi.org/project/platformdirs/
 
 UPDATE HISTORY:
+    Updated 01/2026: raise original exceptions in cases of HTTPError/URLError
     Written 01/2026
 """
 
@@ -567,7 +568,7 @@ def check_connection(
     ----------
     HOST: str
         remote http host
-    context: obj, default xadvect.utilities._default_ssl_context
+    context: obj, default xAdvect.utilities._default_ssl_context
         SSL context for ``urllib`` opener object
     timeout: int, default 20
         timeout in seconds for blocking operations
@@ -577,10 +578,11 @@ def check_connection(
         urllib2.urlopen(HOST, timeout=timeout, context=context)
     except urllib2.HTTPError as exc:
         logging.debug(exc.code)
-        raise RuntimeError(exc.reason) from exc
+        raise
     except urllib2.URLError as exc:
         logging.debug(exc.reason)
-        raise RuntimeError("Check internet connection") from exc
+        exc.message = "Check internet connection"
+        raise
     else:
         return True
 
@@ -605,7 +607,7 @@ def http_list(
         remote http host path
     timeout: int or NoneType, default None
         timeout in seconds for blocking operations
-    context: obj, default xadvect.utilities._default_ssl_context
+    context: obj, default xAdvect.utilities._default_ssl_context
         SSL context for ``urllib`` opener object
     parser: obj, default lxml.etree.HTMLParser()
         HTML parser for ``lxml``
@@ -633,11 +635,11 @@ def http_list(
         response = urllib2.urlopen(request, timeout=timeout, context=context)
     except urllib2.HTTPError as exc:
         logging.debug(exc.code)
-        raise RuntimeError(exc.reason) from exc
+        raise
     except urllib2.URLError as exc:
         logging.debug(exc.reason)
-        msg = "List error from {0}".format(posixpath.join(*HOST))
-        raise Exception(msg) from exc
+        exc.message = "Check internet connection"
+        raise
     else:
         # read and parse request for files (column names and modified times)
         tree = lxml.etree.parse(response, parser)
@@ -686,7 +688,7 @@ def from_http(
         remote http host path split as list
     timeout: int or NoneType, default None
         timeout in seconds for blocking operations
-    context: obj, default xadvect.utilities._default_ssl_context
+    context: obj, default xAdvect.utilities._default_ssl_context
         SSL context for ``urllib`` opener object
     local: str, pathlib.Path or NoneType, default None
         path to local file
@@ -719,8 +721,13 @@ def from_http(
         # Create and submit request.
         request = urllib2.Request(posixpath.join(*HOST), **kwargs)
         response = urllib2.urlopen(request, timeout=timeout, context=context)
-    except:
-        raise Exception("Download error from {0}".format(posixpath.join(*HOST)))
+    except urllib2.HTTPError as exc:
+        logging.debug(exc.code)
+        raise
+    except urllib2.URLError as exc:
+        logging.debug(exc.reason)
+        exc.message = "Check internet connection"
+        raise
     else:
         # copy remote file contents to bytesIO object
         remote_buffer = io.BytesIO()
@@ -768,7 +775,7 @@ def from_json(
         remote http host path split as list
     timeout: int or NoneType, default None
         timeout in seconds for blocking operations
-    context: obj, default xadvect.utilities._default_ssl_context
+    context: obj, default xAdvect.utilities._default_ssl_context
         SSL context for ``urllib`` opener object
     headers: dict, default {}
         dictionary of headers to append from url request
@@ -784,11 +791,11 @@ def from_json(
         response = urllib2.urlopen(request, timeout=timeout, context=context)
     except urllib2.HTTPError as exc:
         logging.debug(exc.code)
-        raise RuntimeError(exc.reason) from exc
+        raise
     except urllib2.URLError as exc:
         logging.debug(exc.reason)
-        msg = "Load error from {0}".format(posixpath.join(*HOST))
-        raise Exception(msg) from exc
+        exc.message = "Check internet connection"
+        raise
     else:
         # copy headers from response
         headers.update({k.lower(): v for k, v in response.getheaders()})
