@@ -905,6 +905,6 @@ def fetch(path: pathlib.Path = get_cache_path(), **kwargs):
         if not local.exists():
             from_earthdata(url, local=local)
         # append to list of granules
-        granules.append(local)  
+        granules.append(local)
     # return list of granules
     return granules
