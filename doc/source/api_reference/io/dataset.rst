@@ -11,10 +11,10 @@ dataset
 General Attributes and Methods
 ==============================
 
-.. autoclass:: xAdvect.io.Dataset
+.. autoclass:: xAdvect.io.dataset.Dataset
    :members:
 
-.. autoclass:: xAdvect.io.DataArray
+.. autoclass:: xAdvect.io.dataset.DataArray
    :members:
 
 .. autofunction:: xAdvect.io.dataset._transform
