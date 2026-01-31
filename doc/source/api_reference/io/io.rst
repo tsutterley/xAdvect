@@ -8,4 +8,7 @@ Input/output functions for reading and writing velocity data
     :maxdepth: 1
 
     dataset.rst
+    geotiff.rst
+    netcdf.rst
 
+.. autofunction:: xAdvect.io.open_dataset

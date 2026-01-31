@@ -5,6 +5,7 @@ Written by Tyler Sutterley (01/2026)
 Download routines for NASA Earthdata files
 
 UPDATE HISTORY:
+    Updated 01/2026: return the list of queried granules from fetch
     Written 01/2026
 """
 
@@ -632,7 +633,6 @@ def from_earthdata(
     hash: str = "",
     chunk: int = 16384,
     verbose: bool = False,
-    fid=sys.stdout,
     mode: oct = 0o775,
 ):
     """
@@ -660,8 +660,6 @@ def from_earthdata(
         chunk size for transfer encoding
     verbose: bool, default False
         print file transfer information
-    fid: obj, default sys.stdout
-        open file object to print if verbose
     mode: oct, default 0o775
         permissions mode of output local file
 
@@ -674,7 +672,7 @@ def from_earthdata(
     """
     # create logger
     loglevel = logging.INFO if verbose else logging.CRITICAL
-    logging.basicConfig(stream=fid, level=loglevel)
+    logging.basicConfig(level=loglevel)
     # attempt to build urllib2 opener and check credentials
     if build:
         attempt_login(urs, username=username, password=password)
@@ -780,7 +778,6 @@ def cmr(
     opener=None,
     context: ssl.SSLContext = _default_ssl_context,
     verbose: bool = False,
-    fid=sys.stdout,
     **kwargs,
 ):
     """
@@ -808,8 +805,6 @@ def cmr(
         SSL context for ``urllib`` opener object
     verbose: bool, default False
         print file transfer information
-    fid: obj, default sys.stdout
-        open file object to print if verbose
 
     Returns
     -------
@@ -818,7 +813,7 @@ def cmr(
     """
     # create logger
     loglevel = logging.INFO if verbose else logging.CRITICAL
-    logging.basicConfig(stream=fid, level=loglevel)
+    logging.basicConfig(level=loglevel)
     # attempt to build urllib2 opener
     if opener is None:
         # build urllib2 opener with SSL context
@@ -893,7 +888,13 @@ def fetch(path: pathlib.Path = get_cache_path(), **kwargs):
         local path to download resources
     kwargs: dict
         keyword arguments for ``cmr``
+
+    Returns
+    -------
+    granules: list
+        local paths for queried resources
     """
+    granules = []
     # for each url in the CMR query
     for url in cmr(**kwargs):
         # split the url into parts and get the granule name
@@ -903,3 +904,7 @@ def fetch(path: pathlib.Path = get_cache_path(), **kwargs):
         # check if existing and download if not
         if not local.exists():
             from_earthdata(url, local=local)
+        # append to list of granules
+        granules.append(local)
+    # return list of granules
+    return granules
