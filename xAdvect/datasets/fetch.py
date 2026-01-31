@@ -477,10 +477,7 @@ def get_token(
     # attempt to build urllib2 opener and check credentials
     if build:
         attempt_login(
-            urs,
-            password_manager=False,
-            authorization_header=True,
-            **kwargs
+            urs, password_manager=False, authorization_header=True, **kwargs
         )
     # create post response with Earthdata token API
     try:
@@ -501,7 +498,7 @@ def list_tokens(
     HOST: str = "https://urs.earthdata.nasa.gov/api/users/tokens",
     build: bool = True,
     urs: str = "urs.earthdata.nasa.gov",
-    **kwargs
+    **kwargs,
 ):
     """
     List the current associated NASA Earthdata User Tokens
