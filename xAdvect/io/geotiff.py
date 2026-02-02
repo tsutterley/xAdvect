@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 geotiff.py
-Written by Tyler Sutterley (01/2026)
+Written by Tyler Sutterley (02/2026)
 
 Reads geotiff files as xarray Datasets
 
@@ -13,6 +13,7 @@ PYTHON DEPENDENCIES:
         https://docs.xarray.dev/en/stable/
 
 UPDATE HISTORY:
+    Updated 02/2026: added logging information when opening files
     Written 01/2026
 """
 
@@ -21,6 +22,7 @@ from __future__ import division, annotations
 import os
 import re
 import pyproj
+import logging
 import pathlib
 import warnings
 import numpy as np
@@ -194,12 +196,14 @@ def open_dataarray(
     """
     # get coordinate reference system (CRS) information from kwargs
     crs = kwargs.get("crs", None)
-    # name of the input file
-    name = xAdvect.utilities.Path(filename).name
+    # verbose logging
+    logging.debug(f"Opening GeoTIFF file: {filename}")
     # open the geotiff file using rioxarray
     darr = rioxarray.open_rasterio(
         filename, masked=True, chunks=chunks, **kwargs
     )
+    # name of the input file
+    name = xAdvect.utilities.Path(filename).name
     # assign time dimension for long-term averages or from filename pattern
     if longterm:
         pass

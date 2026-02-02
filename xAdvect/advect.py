@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 advect.py
-Written by Tyler Sutterley (01/2026)
+Written by Tyler Sutterley (02/2026)
 Routines for advecting ice parcels using velocity estimates
 
 PYTHON DEPENDENCIES:
@@ -12,6 +12,7 @@ PYTHON DEPENDENCIES:
         https://docs.xarray.dev/en/stable/
 
 UPDATE HISTORY:
+    Updated 02/2026: adjust logging levels for advection steps
     Written 01/2026
 """
 
@@ -210,7 +211,7 @@ class Advect:
             n_steps = np.abs(np.mean(self.t0) - np.mean(self.t)) / step
         # check input advection functions
         kwargs.update({"N": np.int64(n_steps)})
-        logging.debug(f"Advecting {n_steps} steps")
+        logging.info(f"Advecting {kwargs['N']} steps")
         if self.integrator == "euler":
             # euler: Explicit Euler method
             return self.euler(**kwargs)
@@ -242,6 +243,7 @@ class Advect:
         # keep track of time for 3-dimensional interpolations
         t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
+            logging.debug(f"Euler step {i+1} of {kwargs['N']}")
             ds = self.interp(x=self.x0, y=self.y0, t=t)
             # add displacements to x0 and y0
             self.x0 += ds.U.values * dt
@@ -270,6 +272,7 @@ class Advect:
         # keep track of time for 3-dimensional interpolations
         t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
+            logging.debug(f"RK4 step {i+1} of {kwargs['N']}")
             ds1 = self.interp(x=self.x0, y=self.y0, t=t)
             x2 = self.x0 + 0.5 * ds1.U.values * dt
             y2 = self.y0 + 0.5 * ds1.V.values * dt
@@ -356,6 +359,7 @@ class Advect:
             # keep track of time for 3-dimensional interpolations
             t = copy.deepcopy(self.t)
             for i in range(scale * kwargs["N"]):
+                logging.debug(f"RKF45 step {i+1} of {scale*kwargs['N']}")
                 # calculate fourth order accurate solutions
                 u4, v4 = self.RFK45_interp(X4OA, Y4OA, dt, t=t)
                 # add displacements to X40A and Y40A
@@ -371,7 +375,7 @@ class Advect:
             # calculate difference between 4th and 5th order accurate solutions
             variance = (X5OA - X4OA) ** 2 + (Y5OA - Y4OA) ** 2
             sigma = np.sqrt(np.nanmean(variance))
-            logging.debug(f"RKF45 sigma: {sigma:.4f} (tolerance: {tolerance})")
+            logging.info(f"RKF45 sigma: {sigma:.4f} (tolerance: {tolerance})")
             # if sigma is less than the tolerance: save x and y coordinates
             # else: multiply scale by factors of 2 and re-run iteration
             if (sigma <= tolerance) or np.isnan(sigma):
