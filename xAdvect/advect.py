@@ -243,7 +243,7 @@ class Advect:
         # keep track of time for 3-dimensional interpolations
         t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
-            logging.debug(f"Euler step {i+1} of {kwargs['N']}")
+            logging.debug(f"Euler step {i + 1} of {kwargs['N']}")
             ds = self.interp(x=self.x0, y=self.y0, t=t)
             # add displacements to x0 and y0
             self.x0 += ds.U.values * dt
@@ -272,7 +272,7 @@ class Advect:
         # keep track of time for 3-dimensional interpolations
         t = copy.deepcopy(self.t)
         for i in range(kwargs["N"]):
-            logging.debug(f"RK4 step {i+1} of {kwargs['N']}")
+            logging.debug(f"RK4 step {i + 1} of {kwargs['N']}")
             ds1 = self.interp(x=self.x0, y=self.y0, t=t)
             x2 = self.x0 + 0.5 * ds1.U.values * dt
             y2 = self.y0 + 0.5 * ds1.V.values * dt
@@ -359,7 +359,7 @@ class Advect:
             # keep track of time for 3-dimensional interpolations
             t = copy.deepcopy(self.t)
             for i in range(scale * kwargs["N"]):
-                logging.debug(f"RKF45 step {i+1} of {scale*kwargs['N']}")
+                logging.debug(f"RKF45 step {i + 1} of {scale * kwargs['N']}")
                 # calculate fourth order accurate solutions
                 u4, v4 = self.RFK45_interp(X4OA, Y4OA, dt, t=t)
                 # add displacements to X40A and Y40A
