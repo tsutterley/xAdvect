@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 netcdf.py
-Written by Tyler Sutterley (01/2026)
+Written by Tyler Sutterley (02/2026)
 
 Reads netCDF4 files as xarray Datasets with variable mapping
 
@@ -15,6 +15,7 @@ PYTHON DEPENDENCIES:
         https://docs.xarray.dev/en/stable/
 
 UPDATE HISTORY:
+    Updated 02/2026: added logging information when opening files
     Written 01/2026
 """
 
@@ -23,6 +24,7 @@ from __future__ import division, annotations
 import os
 import pyproj
 import pathlib
+import logging
 import warnings
 import numpy as np
 import xarray as xr
@@ -98,7 +100,9 @@ def open_dataset(
     kwargs.setdefault("longterm", False)
     # get coordinate reference system (CRS) information from kwargs
     crs = kwargs.get("crs", None)
-    # open the NetCDF file using xarray
+    # verbose logging
+    logging.debug(f"Opening netCDF4 file: {filename}")
+    # open the netCDF4 file using xarray
     tmp = xr.open_dataset(filename, mask_and_scale=True, chunks=chunks)
     tmp = tmp.drop_vars(["lon", "lat"], errors="ignore")
     # apply variable mapping if provided

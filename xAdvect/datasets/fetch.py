@@ -445,8 +445,6 @@ def build_opener(
 # PURPOSE: generate a NASA Earthdata user token
 def get_token(
     HOST: str = "https://urs.earthdata.nasa.gov/api/users/token",
-    username: str | None = None,
-    password: str | None = None,
     build: bool = True,
     urs: str = "urs.earthdata.nasa.gov",
 ):
@@ -473,14 +471,13 @@ def get_token(
     token: dict
         JSON response with NASA Earthdata User Token
     """
+    # set default keyword arguments
+    kwargs.setdefault("username", os.environ.get("EARTHDATA_USERNAME"))
+    kwargs.setdefault("password", os.environ.get("EARTHDATA_PASSWORD"))
     # attempt to build urllib2 opener and check credentials
     if build:
         attempt_login(
-            urs,
-            username=username,
-            password=password,
-            password_manager=False,
-            authorization_header=True,
+            urs, password_manager=False, authorization_header=True, **kwargs
         )
     # create post response with Earthdata token API
     try:
@@ -499,10 +496,9 @@ def get_token(
 # PURPOSE: generate a NASA Earthdata user token
 def list_tokens(
     HOST: str = "https://urs.earthdata.nasa.gov/api/users/tokens",
-    username: str | None = None,
-    password: str | None = None,
     build: bool = True,
     urs: str = "urs.earthdata.nasa.gov",
+    **kwargs,
 ):
     """
     List the current associated NASA Earthdata User Tokens
@@ -527,14 +523,16 @@ def list_tokens(
     tokens: list
         JSON response with NASA Earthdata User Tokens
     """
+    # set default keyword arguments
+    kwargs.setdefault("username", os.environ.get("EARTHDATA_USERNAME"))
+    kwargs.setdefault("password", os.environ.get("EARTHDATA_PASSWORD"))
     # attempt to build urllib2 opener and check credentials
     if build:
         attempt_login(
             urs,
-            username=username,
-            password=password,
             password_manager=False,
             authorization_header=True,
+            **kwargs,
         )
     # create get response with Earthdata list tokens API
     try:
@@ -554,8 +552,6 @@ def list_tokens(
 def revoke_token(
     token: str,
     HOST: str = f"https://urs.earthdata.nasa.gov/api/users/revoke_token",
-    username: str | None = None,
-    password: str | None = None,
     build: bool = True,
     urs: str = "urs.earthdata.nasa.gov",
 ):
@@ -579,14 +575,16 @@ def revoke_token(
     urs: str, default 'urs.earthdata.nasa.gov'
         NASA Earthdata URS 3 host
     """
+    # set default keyword arguments
+    kwargs.setdefault("username", os.environ.get("EARTHDATA_USERNAME"))
+    kwargs.setdefault("password", os.environ.get("EARTHDATA_PASSWORD"))
     # attempt to build urllib2 opener and check credentials
     if build:
         attempt_login(
             urs,
-            username=username,
-            password=password,
             password_manager=False,
             authorization_header=True,
+            **kwargs,
         )
     # full path for NASA Earthdata revoke token API
     url = f"{HOST}?token={token}"
@@ -624,8 +622,6 @@ def check_credentials():
 # PURPOSE: download a file from a NASA Earthdata provider
 def from_earthdata(
     HOST: str | list,
-    username: str | None = None,
-    password: str | None = None,
     build: bool = True,
     timeout: int | None = None,
     urs: str = "urs.earthdata.nasa.gov",
@@ -634,6 +630,7 @@ def from_earthdata(
     chunk: int = 16384,
     verbose: bool = False,
     mode: oct = 0o775,
+    **kwargs,
 ):
     """
     Download a file from a NASA Earthdata provider
@@ -670,12 +667,15 @@ def from_earthdata(
     response_error: str or None
         notification for response error
     """
+    # set default keyword arguments
+    kwargs.setdefault("username", os.environ.get("EARTHDATA_USERNAME"))
+    kwargs.setdefault("password", os.environ.get("EARTHDATA_PASSWORD"))
     # create logger
     loglevel = logging.INFO if verbose else logging.CRITICAL
     logging.basicConfig(level=loglevel)
     # attempt to build urllib2 opener and check credentials
     if build:
-        attempt_login(urs, username=username, password=password)
+        attempt_login(urs, **kwargs)
     # verify inputs for remote https host
     if isinstance(HOST, str):
         HOST = url_split(HOST)
